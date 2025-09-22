@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}QR Code Display - SIH Smart Education{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header text-center">
+                <h4><i class="fas fa-qrcode"></i> QR Code for {{ subject.name }}</h4>
+            </div>
+            <div class="card-body">
+                <div class="qr-code-container">
+                    <img src="{{ qr_image }}" alt="QR Code" class="img-fluid">
+                </div>
+                <div class="text-center mt-3">
+                    <p class="text-muted">Expires at: {{ expires_at|date:"H:i" }}</p>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        Students can scan this QR code to mark their attendance.
+                    </div>
+                </div>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'teacher_dashboard' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                    <a href="{% url 'generate_qr' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Generate Another QR Code
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+

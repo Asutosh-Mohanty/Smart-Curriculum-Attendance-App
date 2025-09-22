@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Users{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h3>Students</h3>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th><th>Roll</th><th>Branch</th><th>Degree</th><th>Group</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in students %}
+      <tr>
+        <td>{{ s.user.get_full_name }} ({{ s.user.username }})</td>
+        <td>{{ s.roll_number }}</td>
+        <td>{{ s.branch }}</td>
+        <td>{{ s.degree }}</td>
+        <td>{{ s.group }}</td>
+        <td>
+          <a class="btn btn-sm btn-outline-primary" href="{% url 'admins:user_edit' s.user.id %}">Edit</a>
+          <a class="btn btn-sm btn-outline-danger" href="{% url 'admins:user_delete' s.user.id %}">Delete</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" class="text-muted">No students</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h3 class="mt-4">Teachers</h3>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th><th>Employee ID</th><th>Department</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in teachers %}
+      <tr>
+        <td>{{ t.user.get_full_name }} ({{ t.user.username }})</td>
+        <td>{{ t.employee_id }}</td>
+        <td>{{ t.department }}</td>
+        <td>
+          <a class="btn btn-sm btn-outline-primary" href="{% url 'admins:user_edit' t.user.id %}">Edit</a>
+          <a class="btn btn-sm btn-outline-danger" href="{% url 'admins:user_delete' t.user.id %}">Delete</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4" class="text-muted">No teachers</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

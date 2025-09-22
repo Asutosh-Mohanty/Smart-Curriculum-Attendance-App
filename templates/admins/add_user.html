@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+
+{% block title %}Add User - SIH Smart Education{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-user-plus"></i> Add New User</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="first_name" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="last_name" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="username" name="username" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Role</label>
+                        <select class="form-select" id="role" name="role" required onchange="toggleRoleFields()">
+                            <option value="">Choose a role...</option>
+                            <option value="student">Student</option>
+                            <option value="teacher">Teacher</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Student-specific fields -->
+                    <div id="student-fields" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="roll_number" class="form-label">Roll Number</label>
+                                    <input type="text" class="form-control" id="roll_number" name="roll_number">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="interests" class="form-label">Interests (Optional)</label>
+                                    <input type="text" class="form-control" id="interests" name="interests" placeholder="e.g., Mathematics, Science, Technology">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="branch" class="form-label">Branch</label>
+                                    <select class="form-select" id="branch" name="branch">
+                                        <option value="">Select Branch</option>
+                                        {% for branch in branches %}
+                                        <option value="{{ branch.id }}">{{ branch.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="degree" class="form-label">Degree</label>
+                                    <select class="form-select" id="degree" name="degree">
+                                        <option value="">Select Degree</option>
+                                        {% for degree in degrees %}
+                                        <option value="{{ degree.id }}">{{ degree.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="group" class="form-label">Group</label>
+                                    <select class="form-select" id="group" name="group">
+                                        <option value="">Select Group</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Teacher-specific fields -->
+                    <div id="teacher-fields" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="employee_id" class="form-label">Employee ID</label>
+                                    <input type="text" class="form-control" id="employee_id" name="employee_id">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="department" class="form-label">Department</label>
+                                    <input type="text" class="form-control" id="department" name="department" placeholder="e.g., Computer Science, Mathematics">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-user-plus"></i> Create User
+                        </button>
+                        <a href="{% url 'admins:dashboard' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleRoleFields() {
+    const role = document.getElementById('role').value;
+    const studentFields = document.getElementById('student-fields');
+    const teacherFields = document.getElementById('teacher-fields');
+    
+    // Hide all role-specific fields
+    studentFields.style.display = 'none';
+    teacherFields.style.display = 'none';
+    
+    // Show relevant fields based on role
+    if (role === 'student') {
+        studentFields.style.display = 'block';
+    } else if (role === 'teacher') {
+        teacherFields.style.display = 'block';
+    }
+}
+</script>
+<script>
+// Dependent dropdowns: branch/degree -> group
+function refillGroups(groups) {
+    const groupSel = document.getElementById('group');
+    const current = groupSel.value;
+    groupSel.innerHTML = '<option value="">Select Group</option>';
+    (groups || []).forEach(function(g){
+        const opt = document.createElement('option');
+        opt.value = g.id;
+        opt.textContent = g.label || g.name;
+        groupSel.appendChild(opt);
+    });
+    if ([...groupSel.options].some(o=>o.value===current)) groupSel.value = current;
+}
+
+function fetchGroups() {
+    const degree = document.getElementById('degree').value;
+    const branch = document.getElementById('branch').value;
+    const params = new URLSearchParams();
+    if (degree) params.append('degree', degree);
+    if (branch) params.append('branch', branch);
+    fetch('{% url 'admins:api_groups' %}?'+params.toString(), {headers:{'X-Requested-With':'XMLHttpRequest'}})
+        .then(r=>r.json()).then(data=>{
+            refillGroups(data.results);
+        }).catch(()=>refillGroups([]));
+}
+
+document.getElementById('degree').addEventListener('change', fetchGroups);
+document.getElementById('branch').addEventListener('change', fetchGroups);
+
+// Degree -> Branch filter
+function refillBranches(branches){
+  const branchSel = document.getElementById('branch');
+  const current = branchSel.value;
+  branchSel.innerHTML = '<option value="">Select Branch</option>';
+  (branches||[]).forEach(function(b){
+    const opt = document.createElement('option');
+    opt.value = b.id;
+    opt.textContent = b.name;
+    branchSel.appendChild(opt);
+  });
+  if ([...branchSel.options].some(o=>o.value===current)) branchSel.value = current;
+}
+
+function fetchBranches(){
+  const degree = document.getElementById('degree').value;
+  const params = new URLSearchParams();
+  if (degree) params.append('degree', degree);
+  fetch('{% url 'admins:api_branches' %}?'+params.toString(), {headers:{'X-Requested-With':'XMLHttpRequest'}})
+    .then(r=>r.json()).then(d=>{ refillBranches(d.results); fetchGroups(); })
+    .catch(()=>{ refillBranches([]); refillGroups([]); });
+}
+
+document.getElementById('degree').addEventListener('change', fetchBranches);
+</script>
+{% endblock %}
+
+

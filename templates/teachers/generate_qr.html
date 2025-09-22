@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Generate QR Code - SIH Smart Education{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-qrcode"></i> Generate QR Code for {{ subject.name }}</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        You are about to generate a QR code for <strong>{{ subject.name }} ({{ subject.code }})</strong>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-qrcode"></i> Generate QR Code
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6><i class="fas fa-info-circle"></i> Instructions</h6>
+            </div>
+            <div class="card-body">
+                <ol>
+                    <li>Click "Generate QR Code" to create a QR code for this subject</li>
+                    <li>Display the QR code to students on a screen or projector</li>
+                    <li>Students can scan the QR code using their mobile devices</li>
+                    <li>The QR code will expire after 15 minutes for security</li>
+                    <li>Students will be automatically marked as present when they scan</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

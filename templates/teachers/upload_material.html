@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload Material - SIH Smart Education{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-upload"></i> Upload Study Material for {{ subject.name }}</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Material Title</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        This material will be uploaded for <strong>{{ subject.name }} ({{ subject.code }})</strong>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="file" class="form-label">File</label>
+                        <input type="file" class="form-control" id="file" name="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt" required>
+                        <div class="form-text">Supported formats: PDF, DOC, DOCX, PPT, PPTX, TXT</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description (Optional)</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" placeholder="Brief description of the material..."></textarea>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-upload"></i> Upload Material
+                        </button>
+                        <a href="{% url 'teachers:group_dashboard' subject.id %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Group Dashboard
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6><i class="fas fa-info-circle"></i> Upload Guidelines</h6>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li>Maximum file size: 10MB</li>
+                    <li>Supported formats: PDF, Word documents, PowerPoint presentations, and text files</li>
+                    <li>Use descriptive titles for better organization</li>
+                    <li>Add descriptions to help students understand the content</li>
+                    <li>Materials will be immediately available to all students</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

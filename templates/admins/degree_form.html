@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Degree Form - SIH Smart Education{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-graduation-cap"></i> {% if degree %}Edit Degree{% else %}Create Degree{% endif %}</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Degree Name</label>
+                        <input type="text" class="form-control" id="name" name="name" 
+                               value="{% if degree %}{{ degree.name }}{% endif %}" required>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> {% if degree %}Update{% else %}Create{% endif %} Degree
+                        </button>
+                        <a href="{% url 'admins:degrees_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Degrees
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

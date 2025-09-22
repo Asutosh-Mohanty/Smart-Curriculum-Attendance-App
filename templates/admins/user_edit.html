@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit User{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h3>Edit User</h3>
+  <form method="post">
+    {% csrf_token %}
+    <div class="row">
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label class="form-label">First name</label>
+          <input type="text" class="form-control" name="first_name" value="{{ edit_user.first_name }}" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Last name</label>
+          <input type="text" class="form-control" name="last_name" value="{{ edit_user.last_name }}" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" name="email" value="{{ edit_user.email }}" />
+        </div>
+      </div>
+      <div class="col-md-6">
+        {% if edit_user.student %}
+        <div class="border rounded p-3 mb-3">
+          <h6>Student</h6>
+          <div class="mb-2"><label class="form-label">Roll number</label><input class="form-control" name="roll_number" value="{{ edit_user.student.roll_number }}" /></div>
+          <div class="mb-2"><label class="form-label">Interests</label><input class="form-control" name="interests" value="{{ edit_user.student.interests }}" /></div>
+          <div class="mb-2">
+            <label class="form-label">Branch</label>
+            <select class="form-select" name="branch" id="edit_branch">
+              <option value="">--</option>
+              {% for b in branches %}
+              <option value="{{ b.id }}" {% if edit_user.student.branch_id == b.id %}selected{% endif %}>{{ b.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Degree</label>
+            <select class="form-select" name="degree">
+              <option value="">--</option>
+              {% for d in degrees %}
+              <option value="{{ d.id }}" {% if edit_user.student.degree_id == d.id %}selected{% endif %}>{{ d.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Group</label>
+            <select class="form-select" name="group" id="edit_group">
+              <option value="">--</option>
+              {% for g in groups %}
+              <option value="{{ g.id }}" {% if edit_user.student.group_id == g.id %}selected{% endif %}>{{ g.name }} - {{ g.branch.name }} ({{ g.degree.name }})</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        {% elif edit_user.teacher %}
+        <div class="border rounded p-3">
+          <h6>Teacher</h6>
+          <div class="mb-2"><label class="form-label">Employee ID</label><input class="form-control" name="employee_id" value="{{ edit_user.teacher.employee_id }}" /></div>
+          <div class="mb-2"><label class="form-label">Department</label><input class="form-control" name="department" value="{{ edit_user.teacher.department }}" /></div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="mt-3">
+      <button class="btn btn-primary" type="submit">Save</button>
+      <a class="btn btn-secondary" href="{% url 'admins:users_list' %}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+// On branch/degree change, filter groups
+(function(){
+  const branchSel = document.querySelector('select[name="branch"]');
+  const degreeSel = document.querySelector('select[name="degree"]');
+  const groupSel = document.getElementById('edit_group');
+  const branchDom = document.getElementById('edit_branch');
+  function refillGroups(groups){
+    const current = groupSel.value;
+    groupSel.innerHTML = '<option value="">--</option>';
+    (groups||[]).forEach(function(g){
+      const opt = document.createElement('option');
+      opt.value = g.id;
+      opt.textContent = g.label || g.name;
+      groupSel.appendChild(opt);
+    });
+    if ([...groupSel.options].some(o=>o.value===current)) groupSel.value = current;
+  }
+  function fetchGroups(){
+    const params = new URLSearchParams();
+    if (degreeSel && degreeSel.value) params.append('degree', degreeSel.value);
+    if (branchSel && branchSel.value) params.append('branch', branchSel.value);
+    fetch('{% url 'admins:api_groups' %}?'+params.toString(), {headers:{'X-Requested-With':'XMLHttpRequest'}})
+      .then(r=>r.json()).then(d=>refillGroups(d.results)).catch(()=>refillGroups([]));
+  }
+  if (branchSel) branchSel.addEventListener('change', fetchGroups);
+  if (degreeSel) degreeSel.addEventListener('change', fetchGroups);
+
+  // Degree -> Branch filtering
+  function refillBranches(branches){
+    const current = branchDom.value;
+    branchDom.innerHTML = '<option value="">--</option>';
+    (branches||[]).forEach(function(b){
+      const opt = document.createElement('option');
+      opt.value = b.id;
+      opt.textContent = b.name;
+      branchDom.appendChild(opt);
+    });
+    if ([...branchDom.options].some(o=>o.value===current)) branchDom.value = current;
+  }
+  function fetchBranches(){
+    const params = new URLSearchParams();
+    if (degreeSel && degreeSel.value) params.append('degree', degreeSel.value);
+    fetch('{% url 'admins:api_branches' %}?'+params.toString(), {headers:{'X-Requested-With':'XMLHttpRequest'}})
+      .then(r=>r.json()).then(d=>{ refillBranches(d.results); fetchGroups(); })
+      .catch(()=>{ refillBranches([]); refillGroups([]); });
+  }
+  if (degreeSel) degreeSel.addEventListener('change', fetchBranches);
+})();
+</script>
+{% endblock %}

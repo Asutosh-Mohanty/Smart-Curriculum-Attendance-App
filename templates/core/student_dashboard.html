@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Dashboard - SIH Smart Education{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-user-graduate"></i> Welcome, {{ student.user.get_full_name|default:student.user.username }}!</h2>
+        <p class="text-muted">Roll Number: {{ student.roll_number }}</p>
+    </div>
+</div>
+
+<!-- AI Recommendation -->
+{% if ai_recommendation %}
+<div class="ai-recommendation">
+    <h4><i class="fas fa-robot"></i> AI Recommendation</h4>
+    <p>{{ ai_recommendation }}</p>
+</div>
+{% endif %}
+
+<div class="row">
+    <!-- Attendance Overview -->
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-line"></i> Attendance Overview</h5>
+            </div>
+            <div class="card-body">
+                {% for data in attendance_data %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>{{ data.subject }}</span>
+                    <span class="badge 
+                        {% if data.percentage >= 75 %}bg-success
+                        {% elif data.percentage >= 50 %}bg-warning
+                        {% else %}bg-danger{% endif %}">
+                        {{ data.percentage }}%
+                    </span>
+                </div>
+                {% endfor %}
+                <hr>
+                <div class="text-center">
+                    <strong>Overall: {{ student.attendance_percentage }}%</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Weekly Timetable -->
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-calendar-week"></i> Today's Schedule</h5>
+            </div>
+            <div class="card-body">
+                {% now "l" as today %}
+                {% if today == "Monday" %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Subject</th>
+                                <th>Room</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>09:00</td><td>Mathematics</td><td>A101</td></tr>
+                            <tr><td>10:00</td><td>Physics</td><td>B201</td></tr>
+                            <tr><td>11:00</td><td>Chemistry</td><td>C301</td></tr>
+                            <tr><td>12:00</td><td>English</td><td>D401</td></tr>
+                            <tr><td>14:00</td><td>Computer Science</td><td>E501</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                {% elif today == "Tuesday" %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Subject</th>
+                                <th>Room</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>09:00</td><td>Mathematics</td><td>A101</td></tr>
+                            <tr><td>10:00</td><td>Biology</td><td>F601</td></tr>
+                            <tr><td>11:00</td><td>History</td><td>G701</td></tr>
+                            <tr><td>12:00</td><td>Geography</td><td>H801</td></tr>
+                            <tr><td>14:00</td><td>Physical Education</td><td>Gym</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                {% elif today == "Wednesday" %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Subject</th>
+                                <th>Room</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>09:00</td><td>Physics</td><td>B201</td></tr>
+                            <tr><td>10:00</td><td>Chemistry</td><td>C301</td></tr>
+                            <tr><td>11:00</td><td>Mathematics</td><td>A101</td></tr>
+                            <tr><td>12:00</td><td>Computer Science</td><td>E501</td></tr>
+                            <tr><td>14:00</td><td>English</td><td>D401</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                {% elif today == "Thursday" %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Subject</th>
+                                <th>Room</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>09:00</td><td>Biology</td><td>F601</td></tr>
+                            <tr><td>10:00</td><td>Mathematics</td><td>A101</td></tr>
+                            <tr><td>11:00</td><td>Physics</td><td>B201</td></tr>
+                            <tr><td>12:00</td><td>History</td><td>G701</td></tr>
+                            <tr><td>14:00</td><td>Chemistry</td><td>C301</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                {% elif today == "Friday" %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Subject</th>
+                                <th>Room</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>09:00</td><td>Computer Science</td><td>E501</td></tr>
+                            <tr><td>10:00</td><td>English</td><td>D401</td></tr>
+                            <tr><td>11:00</td><td>Geography</td><td>H801</td></tr>
+                            <tr><td>12:00</td><td>Mathematics</td><td>A101</td></tr>
+                            <tr><td>14:00</td><td>Physical Education</td><td>Gym</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No classes scheduled for today.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'scan_qr' %}" class="btn btn-primary">
+                        <i class="fas fa-qrcode"></i> Mark Attendance
+                    </a>
+                    <a href="{% url 'materials_list' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-file-alt"></i> View Materials
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Materials -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-file-alt"></i> Recent Materials</h5>
+            </div>
+            <div class="card-body">
+                {% if materials %}
+                <div class="list-group list-group-flush">
+                    {% for material in materials %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">{{ material.title }}</h6>
+                            <small class="text-muted">{{ material.subject.name }} - {{ material.upload_date|date:"M d, Y" }}</small>
+                        </div>
+                        <a href="{% url 'download_material' material.id %}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-download"></i>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No materials available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Announcements -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-bullhorn"></i> Recent Announcements</h5>
+            </div>
+            <div class="card-body">
+                {% if announcements %}
+                <div class="list-group list-group-flush">
+                    {% for announcement in announcements %}
+                    <div class="list-group-item">
+                        <h6 class="mb-1">{{ announcement.title }}</h6>
+                        <p class="mb-1">{{ announcement.content|truncatewords:20 }}</p>
+                        <small class="text-muted">{{ announcement.created_at|date:"M d, Y H:i" }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No announcements available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}

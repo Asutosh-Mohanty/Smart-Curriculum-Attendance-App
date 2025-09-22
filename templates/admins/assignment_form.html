@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Assignment{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h4><i class="fas fa-link"></i> Create Group-Subject Assignment</h4>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Group</label>
+                <select class="form-select" name="group" required>
+                  <option value="">--</option>
+                  {% for g in groups %}
+                  <option value="{{ g.id }}">{{ g.name }} - {{ g.branch.name }} ({{ g.degree.name }})</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Subject</label>
+                <select class="form-select" name="subject" required>
+                  <option value="">--</option>
+                  {% for s in subjects %}
+                  <option value="{{ s.id }}">{{ s.name }} ({{ s.code }}) — {{ s.teacher.user.get_full_name|default:s.teacher.user.username }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Teacher</label>
+                <select class="form-select" name="teacher" required>
+                  <option value="">--</option>
+                  {% for t in teachers %}
+                  <option value="{{ t.id }}">{{ t.user.get_full_name|default:t.user.username }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-grid gap-2">
+            <button class="btn btn-primary" type="submit"><i class="fas fa-save"></i> Create Assignment</button>
+            <a class="btn btn-outline-secondary" href="{% url 'admins:assignments_list' %}"><i class="fas fa-arrow-left"></i> Back to Assignments</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

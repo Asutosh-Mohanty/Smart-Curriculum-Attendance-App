@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ subject.name }} - Group Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-chalkboard"></i> {{ subject.name }} ({{ subject.code }})</h2>
+        <p class="text-muted">Manage attendance, upload materials, and view reports for this class</p>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Quick Actions -->
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'teachers:generate_qr' subject.id %}" class="btn btn-primary">
+                        <i class="fas fa-qrcode"></i> Generate QR Code
+                    </a>
+                    <a href="{% url 'teachers:upload_material' subject.id %}" class="btn btn-outline-primary">
+                        <i class="fas fa-upload"></i> Upload Material
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Class Statistics -->
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-bar"></i> Class Statistics</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h3 class="text-primary">{{ students.count }}</h3>
+                        <small class="text-muted">Students</small>
+                    </div>
+                    <div class="col-6">
+                        <h3 class="text-success">{{ materials.count }}</h3>
+                        <small class="text-muted">Materials</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-navigation"></i> Navigation</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'teachers:group_selection' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Groups
+                    </a>
+                    <a href="{% url 'teachers:dashboard' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-home"></i> Main Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Attendance Reports -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-line"></i> Attendance Reports</h5>
+            </div>
+            <div class="card-body">
+                {% if attendance_reports %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Roll Number</th>
+                                <th>Attendance %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for report in attendance_reports %}
+                            <tr>
+                                <td>{{ report.student.user.get_full_name|default:report.student.user.username }}</td>
+                                <td>{{ report.student.roll_number }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if report.percentage >= 75 %}bg-success
+                                        {% elif report.percentage >= 50 %}bg-warning
+                                        {% else %}bg-danger{% endif %}">
+                                        {{ report.percentage }}%
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No attendance data available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Materials -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5><i class="fas fa-file-alt"></i> Materials</h5>
+                <a href="{% url 'teachers:upload_material' subject.id %}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-plus"></i> Upload
+                </a>
+            </div>
+            <div class="card-body">
+                {% if materials %}
+                <div class="list-group list-group-flush">
+                    {% for material in materials %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">{{ material.title }}</h6>
+                            <small class="text-muted">{{ material.upload_date|date:"M d, Y" }}</small>
+                        </div>
+                        <div>
+                            <a href="{{ material.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No materials uploaded yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}
+
+

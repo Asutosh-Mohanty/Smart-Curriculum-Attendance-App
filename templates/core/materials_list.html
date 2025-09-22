@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Study Materials - SIH Smart Education{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-file-alt"></i> Study Materials</h2>
+        <p class="text-muted">Download study materials uploaded by your teachers</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-list"></i> Available Materials</h5>
+            </div>
+            <div class="card-body">
+                {% if materials %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Subject</th>
+                                <th>Uploaded By</th>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for material in materials %}
+                            <tr>
+                                <td>
+                                    <strong>{{ material.title }}</strong>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary">{{ material.subject.name }}</span>
+                                </td>
+                                <td>{{ material.uploaded_by.user.get_full_name|default:material.uploaded_by.user.username }}</td>
+                                <td>{{ material.upload_date|date:"M d, Y" }}</td>
+                                <td>
+                                    {% if material.description %}
+                                        {{ material.description|truncatewords:10 }}
+                                    {% else %}
+                                        <span class="text-muted">No description</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'download_material' material.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-download"></i> Download
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No materials available</h5>
+                    <p class="text-muted">Check back later for study materials from your teachers.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}

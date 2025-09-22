@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}QR Code Display - SIH Smart Education{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header text-center">
+                <h4><i class="fas fa-qrcode"></i> QR Code for {{ subject.name }}</h4>
+            </div>
+            <div class="card-body">
+                <div class="qr-code-container text-center">
+                    <img src="{{ qr_image }}" alt="QR Code" class="img-fluid" style="max-width: 300px;">
+                </div>
+                <div class="text-center mt-3">
+                    <p class="text-muted">Expires at: {{ expires_at|date:"H:i" }}</p>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        Students can scan this QR code to mark their attendance.
+                    </div>
+                    <div class="mt-3">
+                        <label class="form-label fw-semibold">QR code data (for manual entry):</label>
+                        <div class="input-group">
+                            <textarea id="qrDataText" class="form-control" rows="3" readonly>{{ qr_string }}</textarea>
+                            <button class="btn btn-outline-secondary" type="button" id="copyQrBtn">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                        </div>
+                        <div id="copyStatus" class="form-text"></div>
+                    </div>
+                </div>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'teachers:group_dashboard' subject.id %}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left"></i> Back to Group Dashboard
+                    </a>
+                    <a href="{% url 'teachers:generate_qr' subject.id %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Generate Another QR Code
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+document.getElementById('copyQrBtn')?.addEventListener('click', function() {
+    const textarea = document.getElementById('qrDataText');
+    if (!textarea) return;
+    textarea.select();
+    textarea.setSelectionRange(0, 99999);
+    let copied = false;
+    try {
+        copied = document.execCommand('copy');
+    } catch (e) {
+        copied = false;
+    }
+    if (!copied && navigator.clipboard) {
+        navigator.clipboard.writeText(textarea.value).then(function(){
+            copied = true;
+            document.getElementById('copyStatus').innerText = 'Copied to clipboard';
+        }).catch(function(){
+            document.getElementById('copyStatus').innerText = 'Copy failed. Select and copy manually.';
+        });
+    } else {
+        document.getElementById('copyStatus').innerText = copied ? 'Copied to clipboard' : 'Copy failed. Select and copy manually.';
+    }
+});
+</script>
+{% endblock %}

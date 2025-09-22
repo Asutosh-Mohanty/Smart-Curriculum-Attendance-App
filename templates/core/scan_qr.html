@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+
+{% block title %}Scan QR Code - SIH Smart Education{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header text-center">
+                <h4><i class="fas fa-qrcode"></i> Scan QR Code for Attendance</h4>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <div id="scanner-container" style="width: 100%; max-width: 300px; margin: 0 auto;">
+                        <video id="video" width="100%" style="border: 2px solid #dee2e6; border-radius: 10px;"></video>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="qr-input" class="form-label">Or enter QR code data manually:</label>
+                    <textarea class="form-control" id="qr-input" rows="3" placeholder="Paste QR code data here..."></textarea>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button id="scan-btn" class="btn btn-primary">
+                        <i class="fas fa-camera"></i> Start Camera
+                    </button>
+                    <button id="submit-btn" class="btn btn-success" disabled>
+                        <i class="fas fa-check"></i> Mark Attendance
+                    </button>
+                    <a href="{% url 'student_dashboard' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+                
+                <div id="result" class="mt-3"></div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6><i class="fas fa-info-circle"></i> Instructions</h6>
+            </div>
+            <div class="card-body">
+                <ol>
+                    <li>Click "Start Camera" to enable your device's camera</li>
+                    <li>Point your camera at the QR code displayed by your teacher</li>
+                    <li>Wait for the QR code to be detected automatically</li>
+                    <li>Alternatively, you can manually enter the QR code data</li>
+                    <li>Click "Mark Attendance" to confirm your attendance</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script>
+let video = document.getElementById('video');
+let canvas = document.createElement('canvas');
+let context = canvas.getContext('2d');
+let scanning = false;
+let qrData = '';
+
+document.getElementById('scan-btn').addEventListener('click', function() {
+    if (!scanning) {
+        startScanning();
+    } else {
+        stopScanning();
+    }
+});
+
+document.getElementById('qr-input').addEventListener('input', function() {
+    qrData = this.value.trim();
+    document.getElementById('submit-btn').disabled = !qrData;
+});
+
+document.getElementById('submit-btn').addEventListener('click', function() {
+    if (qrData) {
+        submitAttendance(qrData);
+    }
+});
+
+function startScanning() {
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+        .then(function(stream) {
+            video.srcObject = stream;
+            video.play();
+            scanning = true;
+            document.getElementById('scan-btn').innerHTML = '<i class="fas fa-stop"></i> Stop Camera';
+            scanQR();
+        })
+        .catch(function(err) {
+            console.error('Error accessing camera:', err);
+            alert('Unable to access camera. Please try manual entry.');
+        });
+}
+
+function stopScanning() {
+    if (video.srcObject) {
+        video.srcObject.getTracks().forEach(track => track.stop());
+    }
+    scanning = false;
+    document.getElementById('scan-btn').innerHTML = '<i class="fas fa-camera"></i> Start Camera';
+}
+
+function scanQR() {
+    if (!scanning) return;
+    
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height);
+        
+        if (code) {
+            qrData = code.data;
+            document.getElementById('qr-input').value = qrData;
+            document.getElementById('submit-btn').disabled = false;
+            stopScanning();
+            document.getElementById('result').innerHTML = '<div class="alert alert-success"><i class="fas fa-check"></i> QR Code detected! Click "Mark Attendance" to confirm.</div>';
+        }
+    }
+    
+    requestAnimationFrame(scanQR);
+}
+
+function submitAttendance(data) {
+    const resultDiv = document.getElementById('result');
+    resultDiv.innerHTML = '<div class="alert alert-info"><i class="fas fa-spinner fa-spin"></i> Processing...</div>';
+    
+    fetch('{% url "scan_qr" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: 'qr_data=' + encodeURIComponent(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            resultDiv.innerHTML = '<div class="alert alert-success"><i class="fas fa-check"></i> ' + data.message + '</div>';
+            document.getElementById('submit-btn').disabled = true;
+        } else {
+            resultDiv.innerHTML = '<div class="alert alert-danger"><i class="fas fa-times"></i> ' + data.message + '</div>';
+        }
+    })
+    .catch(error => {
+        resultDiv.innerHTML = '<div class="alert alert-danger"><i class="fas fa-times"></i> Error processing attendance. Please try again.</div>';
+    });
+}
+</script>
+{% endblock %}
+
+
+

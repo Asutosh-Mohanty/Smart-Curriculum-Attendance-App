@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Branches{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center">
+    <h3>Branches</h3>
+    <a class="btn btn-primary" href="{% url 'admins:branch_create' %}">Create Branch</a>
+  </div>
+  <table class="table table-striped mt-3">
+    <thead><tr><th>Name</th><th style="width:160px;"></th></tr></thead>
+    <tbody>
+      {% for b in branches %}
+      <tr>
+        <td>{{ b.name }}</td>
+        <td>
+          <a class="btn btn-sm btn-outline-primary" href="{% url 'admins:branch_edit' b.id %}">Edit</a>
+          <a class="btn btn-sm btn-outline-danger" href="{% url 'admins:branch_delete' b.id %}">Delete</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="2" class="text-muted">No branches</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

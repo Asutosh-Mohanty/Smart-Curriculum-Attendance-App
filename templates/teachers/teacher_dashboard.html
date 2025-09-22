@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block title %}Teacher Dashboard - SIH Smart Education{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-chalkboard-teacher"></i> Welcome, {{ teacher.user.get_full_name|default:teacher.user.username }}!</h2>
+        <p class="text-muted">Department: {{ teacher.department }} | Employee ID: {{ teacher.employee_id }}</p>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Quick Actions -->
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'teachers:group_selection' %}" class="btn btn-primary">
+                        <i class="fas fa-users"></i> Select Group/Class
+                    </a>
+                    <a href="{% url 'teachers:group_selection' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-qrcode"></i> Generate QR Code
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Groups & Subjects -->
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-users"></i> My Groups & Subjects</h5>
+            </div>
+            <div class="card-body">
+                {% if assignments %}
+                <div class="list-group list-group-flush">
+                    {% for a in assignments %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">{{ a.group.name }} - {{ a.subject.name }}</h6>
+                            <small class="text-muted">{{ a.group.branch.name }} ({{ a.group.degree.name }}) • {{ a.subject.code }}</small>
+                        </div>
+                        <div class="btn-group">
+                            <a href="{% url 'teachers:group_dashboard' a.subject.id %}" class="btn btn-sm btn-outline-primary" title="Open Group Dashboard">
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                            <a href="{% url 'teachers:attendance_report' a.id %}" class="btn btn-sm btn-outline-secondary" title="Attendance Report">
+                                <i class="fas fa-chart-line"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No groups assigned yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Materials -->
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-file-alt"></i> Recent Materials</h5>
+            </div>
+            <div class="card-body">
+                {% if materials %}
+                <div class="list-group list-group-flush">
+                    {% for material in materials %}
+                    <div class="list-group-item">
+                        <h6 class="mb-1">{{ material.title }}</h6>
+                        <small class="text-muted">{{ material.subject.name }} - {{ material.upload_date|date:"M d, Y" }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No materials uploaded yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Attendance Reports -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-line"></i> Attendance Reports</h5>
+            </div>
+            <div class="card-body">
+                {% if attendance_reports %}
+                {% for report in attendance_reports %}
+                <div class="mb-4">
+                    <h6>{{ report.subject.name }} ({{ report.subject.code }})</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Roll Number</th>
+                                    <th>Attendance %</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student_report in report.reports %}
+                                <tr>
+                                    <td>{{ student_report.student.user.get_full_name|default:student_report.student.user.username }}</td>
+                                    <td>{{ student_report.student.roll_number }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if student_report.percentage >= 75 %}bg-success
+                                            {% elif student_report.percentage >= 50 %}bg-warning
+                                            {% else %}bg-danger{% endif %}">
+                                            {{ student_report.percentage }}%
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-muted">No attendance data available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Announcements -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-bullhorn"></i> Recent Announcements</h5>
+            </div>
+            <div class="card-body">
+                {% if announcements %}
+                <div class="list-group list-group-flush">
+                    {% for announcement in announcements %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">{{ announcement.title }}</h6>
+                                <p class="mb-1">{{ announcement.content|truncatewords:30 }}</p>
+                                <small class="text-muted">
+                                    By {{ announcement.created_by.get_full_name|default:announcement.created_by.username }} 
+                                    on {{ announcement.created_at|date:"M d, Y H:i" }}
+                                </small>
+                                <div class="mt-1">
+                                    <span class="badge bg-info">{{ announcement.get_target_audience_display }}</span>
+                                </div>
+                            </div>
+                            <span class="badge {% if announcement.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                                {% if announcement.is_active %}Active{% else %}Inactive{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No announcements available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}
+
+

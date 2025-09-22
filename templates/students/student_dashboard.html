@@ -1,0 +1,482 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Dashboard - SIH Smart Education{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-user-graduate"></i> Welcome, {{ student.user.get_full_name|default:student.user.username }}!</h2>
+        <p class="text-muted">Roll Number: {{ student.roll_number }}</p>
+    </div>
+</div>
+
+
+<!-- AI Recommendation (OpenAI-powered) -->
+<div id="ai-suggestions" class="card mb-4">
+    <div class="card-header">
+      <h5><i class="fas fa-robot"></i> Free-period suggestions</h5>
+    </div>
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <small class="text-muted">Suggested tasks you can finish in a free period (5–20 mins).</small>
+        <div>
+          <button id="ai-generate" class="btn btn-sm btn-success me-2">
+            <i class="fas fa-magic"></i> AI Generate
+          </button>
+          <button id="refresh-suggest" class="btn btn-sm btn-outline-primary">Refresh</button>
+        </div>
+      </div>
+  
+      <ul id="suggestions-list" class="list-group list-group-flush">
+        <li class="list-group-item">Loading suggestions…</li>
+      </ul>
+  
+      <div id="suggestions-error" class="mt-2 text-danger" style="display:none;"></div>
+      
+      <!-- Completed Tasks Section -->
+      <div class="mt-4">
+        <h6><i class="fas fa-check-circle text-success"></i> Recently Completed Tasks</h6>
+        <div id="completed-tasks" class="mt-2">
+          <small class="text-muted">Loading completed tasks...</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="row">
+    <!-- Attendance Overview -->
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-chart-line"></i> Attendance Overview</h5>
+            </div>
+            <div class="card-body">
+                {% for data in attendance_data %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>{{ data.subject }}</span>
+                    <span class="badge 
+                        {% if data.percentage >= 75 %}bg-success
+                        {% elif data.percentage >= 50 %}bg-warning
+                        {% else %}bg-danger{% endif %}">
+                        {{ data.percentage }}%
+                    </span>
+                </div>
+                {% endfor %}
+                <hr>
+                <div class="text-center">
+                    <strong>Overall: {{ student.attendance_percentage }}%</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Weekly Timetable -->
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-calendar-week"></i> Today's Schedule</h5>
+            </div>
+            <div class="card-body">
+                {% now "l" as today %}
+                {% if today == "Monday" %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Subject</th>
+                                <th>Room</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>09:00</td><td>Mathematics</td><td>A101</td></tr>
+                            <tr><td>10:00</td><td>Physics</td><td>B201</td></tr>
+                            <tr><td>11:00</td><td>Chemistry</td><td>C301</td></tr>
+                            <tr><td>12:00</td><td>English</td><td>D401</td></tr>
+                            <tr><td>14:00</td><td>Computer Science</td><td>E501</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                {% elif today == "Tuesday" %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Subject</th>
+                                <th>Room</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>09:00</td><td>Mathematics</td><td>A101</td></tr>
+                            <tr><td>10:00</td><td>Biology</td><td>F601</td></tr>
+                            <tr><td>11:00</td><td>History</td><td>G701</td></tr>
+                            <tr><td>12:00</td><td>Geography</td><td>H801</td></tr>
+                            <tr><td>14:00</td><td>Physical Education</td><td>Gym</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                {% elif today == "Wednesday" %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Subject</th>
+                                <th>Room</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>09:00</td><td>Physics</td><td>B201</td></tr>
+                            <tr><td>10:00</td><td>Chemistry</td><td>C301</td></tr>
+                            <tr><td>11:00</td><td>Mathematics</td><td>A101</td></tr>
+                            <tr><td>12:00</td><td>Computer Science</td><td>E501</td></tr>
+                            <tr><td>14:00</td><td>English</td><td>D401</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                {% elif today == "Thursday" %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Subject</th>
+                                <th>Room</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>09:00</td><td>Biology</td><td>F601</td></tr>
+                            <tr><td>10:00</td><td>Mathematics</td><td>A101</td></tr>
+                            <tr><td>11:00</td><td>Physics</td><td>B201</td></tr>
+                            <tr><td>12:00</td><td>History</td><td>G701</td></tr>
+                            <tr><td>14:00</td><td>Chemistry</td><td>C301</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                {% elif today == "Friday" %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Subject</th>
+                                <th>Room</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>09:00</td><td>Computer Science</td><td>E501</td></tr>
+                            <tr><td>10:00</td><td>English</td><td>D401</td></tr>
+                            <tr><td>11:00</td><td>Geography</td><td>H801</td></tr>
+                            <tr><td>12:00</td><td>Mathematics</td><td>A101</td></tr>
+                            <tr><td>14:00</td><td>Physical Education</td><td>Gym</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No classes scheduled for today.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'students:scan_qr' %}" class="btn btn-primary">
+                        <i class="fas fa-qrcode"></i> Mark Attendance
+                    </a>
+                    <a href="{% url 'students:materials_list' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-file-alt"></i> View Materials
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Materials -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-file-alt"></i> Recent Materials</h5>
+            </div>
+            <div class="card-body">
+                {% if materials %}
+                <div class="list-group list-group-flush">
+                    {% for material in materials %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">{{ material.title }}</h6>
+                            <small class="text-muted">{{ material.subject.name }} - {{ material.upload_date|date:"M d, Y" }}</small>
+                        </div>
+                        <a href="{% url 'students:download_material' material.id %}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-download"></i>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No materials available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Announcements -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-bullhorn"></i> Recent Announcements</h5>
+            </div>
+            <div class="card-body">
+                {% if announcements %}
+                <div class="list-group list-group-flush">
+                    {% for announcement in announcements %}
+                    <div class="list-group-item">
+                        <h6 class="mb-1">{{ announcement.title }}</h6>
+                        <p class="mb-1">{{ announcement.content|truncatewords:20 }}</p>
+                        <small class="text-muted">{{ announcement.created_at|date:"M d, Y H:i" }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No announcements available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  async function loadSuggestions(force=false) {
+    const listEl = document.getElementById('suggestions-list');
+    const errEl = document.getElementById('suggestions-error');
+    errEl.style.display = 'none';
+    listEl.innerHTML = '<li class="list-group-item">Loading suggestions…</li>';
+
+    // Update URL if your include path differs: we expect /ai/free-suggestions/
+    const url = "{% url 'ai_suggestions:free_suggestions' %}" + (force ? "?force=1" : "");
+    try {
+      const resp = await fetch(url, { credentials: 'same-origin' });
+      if (!resp.ok) {
+        if (resp.status === 429) {
+          errEl.textContent = "Rate limited — try again in a few seconds.";
+        } else if (resp.status === 403) {
+          errEl.textContent = "You must be a student to view suggestions.";
+        } else {
+          errEl.textContent = "Unable to fetch suggestions (server error).";
+        }
+        errEl.style.display = 'block';
+        listEl.innerHTML = '';
+        return;
+      }
+
+      const data = await resp.json();
+      const suggestions = data.suggestions || [];
+      listEl.innerHTML = '';
+      if (!suggestions.length) {
+        listEl.innerHTML = '<li class="list-group-item text-muted">No suggestions available.</li>';
+        return;
+      }
+
+      suggestions.forEach(s => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center';
+        li.innerHTML = `
+          <div class="form-check">
+            <input class="form-check-input task-checkbox" type="checkbox" 
+                   data-title="${s.title}" 
+                   data-reason="${s.reason || ''}" 
+                   data-time="${s.time_minutes || 10}"
+                   data-suggestion-id="${s.suggestion_id || ''}"
+                   id="task-${s.title.replace(/\s+/g, '-').toLowerCase()}">
+            <label class="form-check-label" for="task-${s.title.replace(/\s+/g, '-').toLowerCase()}">
+              <div><strong>${s.title}</strong> <small class="text-muted">— ${s.time_minutes || '?'} min</small></div>
+              <div><small class="text-muted">${s.reason || ''}</small></div>
+            </label>
+          </div>
+        `;
+        listEl.appendChild(li);
+      });
+
+    } catch (err) {
+      errEl.textContent = "Network error while fetching suggestions.";
+      errEl.style.display = 'block';
+      listEl.innerHTML = '';
+      console.error("Error loading suggestions:", err);
+    }
+  }
+
+  async function generateRandomTasks() {
+    try {
+      const resp = await fetch("{% url 'ai_suggestions:random_suggestions' %}", {
+        credentials: 'same-origin'
+      });
+
+      if (!resp.ok) {
+        throw new Error('Failed to generate random tasks');
+      }
+
+      const data = await resp.json();
+      const suggestions = data.suggestions || [];
+      
+      // Update the suggestions list
+      const listEl = document.getElementById('suggestions-list');
+      listEl.innerHTML = '';
+      
+      if (suggestions.length) {
+        suggestions.forEach(s => {
+          const li = document.createElement('li');
+          li.className = 'list-group-item d-flex justify-content-between align-items-center';
+          li.innerHTML = `
+            <div class="form-check">
+              <input class="form-check-input task-checkbox" type="checkbox" 
+                     data-title="${s.title}" 
+                     data-reason="${s.reason || ''}" 
+                     data-time="${s.time_minutes || 10}"
+                     data-suggestion-id="${s.suggestion_id || ''}"
+                     id="task-${s.title.replace(/\s+/g, '-').toLowerCase()}">
+              <label class="form-check-label" for="task-${s.title.replace(/\s+/g, '-').toLowerCase()}">
+                <div><strong>${s.title}</strong> <small class="text-muted">— ${s.time_minutes || '?'} min</small></div>
+                <div><small class="text-muted">${s.reason || ''}</small></div>
+              </label>
+            </div>
+          `;
+          listEl.appendChild(li);
+        });
+        showNotification('New random tasks generated!', 'success');
+      } else {
+        listEl.innerHTML = '<li class="list-group-item text-muted">No tasks available.</li>';
+      }
+    } catch (err) {
+      showNotification('Error generating random tasks', 'error');
+      console.error("Error generating random tasks:", err);
+    }
+  }
+
+  async function markTaskCompleted(taskData) {
+    try {
+      const resp = await fetch("{% url 'ai_suggestions:mark_completed' %}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+        },
+        body: JSON.stringify(taskData),
+        credentials: 'same-origin'
+      });
+
+      if (!resp.ok) {
+        throw new Error('Failed to mark task as completed');
+      }
+
+      const data = await resp.json();
+      if (data.success) {
+        // Show success message
+        showNotification(data.message, 'success');
+        
+        // Remove the completed task from the list
+        const taskElement = document.querySelector(`input[data-title="${taskData.task_title}"]`);
+        if (taskElement) {
+          const listItem = taskElement.closest('li');
+          if (listItem) {
+            listItem.remove();
+          }
+        }
+        
+        // Reload completed tasks
+        loadCompletedTasks();
+      }
+    } catch (err) {
+      showNotification('Error marking task as completed', 'error');
+      console.error("Error marking task completed:", err);
+    }
+  }
+
+  async function loadCompletedTasks() {
+    try {
+      const resp = await fetch("{% url 'ai_suggestions:completed_tasks' %}", {
+        credentials: 'same-origin'
+      });
+      
+      if (resp.ok) {
+        const data = await resp.json();
+        const completedTasksEl = document.getElementById('completed-tasks');
+        
+        if (data.completed_tasks && data.completed_tasks.length > 0) {
+          completedTasksEl.innerHTML = data.completed_tasks.map(task => 
+            `<div class="badge bg-success me-2 mb-1">
+              <i class="fas fa-check"></i> ${task.task_title} (${task.time_minutes}min)
+            </div>`
+          ).join('');
+        } else {
+          completedTasksEl.innerHTML = '<small class="text-muted">No completed tasks yet.</small>';
+        }
+      }
+    } catch (err) {
+      console.error("Error loading completed tasks:", err);
+    }
+  }
+
+  function showNotification(message, type = 'info') {
+    // Create a simple notification
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
+      }
+    }, 3000);
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const refreshBtn = document.getElementById('refresh-suggest');
+    const aiGenerateBtn = document.getElementById('ai-generate');
+    
+    if (refreshBtn) refreshBtn.addEventListener('click', () => loadSuggestions(true));
+    if (aiGenerateBtn) aiGenerateBtn.addEventListener('click', () => generateRandomTasks());
+    
+    // Handle checkbox changes
+    document.addEventListener('change', function(e) {
+      if (e.target.classList.contains('task-checkbox') && e.target.checked) {
+        const taskData = {
+          task_title: e.target.dataset.title,
+          task_reason: e.target.dataset.reason,
+          time_minutes: parseInt(e.target.dataset.time),
+          suggestion_id: e.target.dataset.suggestionId
+        };
+        
+        markTaskCompleted(taskData);
+        
+        // Uncheck the checkbox after processing
+        e.target.checked = false;
+      }
+    });
+    
+    // Initial load
+    loadSuggestions(false);
+    loadCompletedTasks();
+  });
+</script>
+{% endblock %}
+
+
+

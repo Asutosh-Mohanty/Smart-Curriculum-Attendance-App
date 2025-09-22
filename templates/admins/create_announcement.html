@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Announcement - SIH Smart Education{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-bullhorn"></i> Create New Announcement</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Announcement Title</label>
+                        <input type="text" class="form-control" id="title" name="title" required placeholder="Enter a clear, descriptive title">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="content" class="form-label">Content</label>
+                        <textarea class="form-control" id="content" name="content" rows="8" required placeholder="Enter the announcement content..."></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="target_audience" class="form-label">Target Audience</label>
+                        <select class="form-select" id="target_audience" name="target_audience" required>
+                            <option value="all">All Users (Students & Teachers)</option>
+                            <option value="students">Students Only</option>
+                            <option value="teachers">Teachers Only</option>
+                        </select>
+                        <div class="form-text">Select who should receive this announcement.</div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Note:</strong> The announcement will be sent to the selected audience once created.
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-bullhorn"></i> Create Announcement
+                        </button>
+                        <a href="{% url 'admins:dashboard' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6><i class="fas fa-info-circle"></i> Announcement Guidelines</h6>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li>Use clear and concise titles</li>
+                    <li>Keep content relevant and informative</li>
+                    <li>Include important dates and deadlines</li>
+                    <li>Use proper formatting for better readability</li>
+                    <li>Announcements are immediately visible to all users</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

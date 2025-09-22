@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Assignments{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12 d-flex justify-content-between align-items-center mb-3">
+    <h4><i class="fas fa-link"></i> Group-Subject Assignments</h4>
+    <a href="{% url 'admins:assignment_create' %}" class="btn btn-primary"><i class="fas fa-plus"></i> New Assignment</a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    {% if assignments %}
+    <div class="table-responsive">
+      <table class="table table-sm">
+        <thead>
+          <tr>
+            <th>Group</th>
+            <th>Subject</th>
+            <th>Teacher</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for a in assignments %}
+          <tr>
+            <td>{{ a.group.name }} - {{ a.group.branch.name }} ({{ a.group.degree.name }})</td>
+            <td>{{ a.subject.name }} ({{ a.subject.code }})</td>
+            <td>{{ a.teacher.user.get_full_name|default:a.teacher.user.username }}</td>
+            <td class="text-end">
+              <a href="{% url 'admins:assignment_delete' a.id %}" class="btn btn-sm btn-outline-danger">Delete</a>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="text-muted mb-0">No assignments yet.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+

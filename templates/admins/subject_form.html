@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Subject Form - SIH Smart Education{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-book"></i> {% if subject %}Edit Subject{% else %}Create Subject{% endif %}</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Subject Name</label>
+                                <input type="text" class="form-control" id="name" name="name" 
+                                       value="{% if subject %}{{ subject.name }}{% endif %}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="code" class="form-label">Subject Code</label>
+                                <input type="text" class="form-control" id="code" name="code" 
+                                       value="{% if subject %}{{ subject.code }}{% endif %}" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="teacher" class="form-label">Teacher (Optional)</label>
+                        <select class="form-select" id="teacher" name="teacher">
+                            <option value="">Choose a teacher...</option>
+                            {% for t in teachers %}
+                            <option value="{{ t.id }}" {% if subject and subject.teacher_id == t.id %}selected{% endif %}>
+                                {{ t.user.get_full_name|default:t.user.username }} ({{ t.employee_id }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> {% if subject %}Update{% else %}Create{% endif %} Subject
+                        </button>
+                        <a href="{% url 'admins:subjects_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Subjects
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

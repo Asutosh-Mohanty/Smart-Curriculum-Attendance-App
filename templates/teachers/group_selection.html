@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Select Group/Class - SIH Smart Education{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-users"></i> Select Group/Class</h2>
+        <p class="text-muted">Choose a subject to manage attendance, upload materials, and view reports</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-book"></i> Your Subjects</h5>
+            </div>
+            <div class="card-body">
+                {% if subjects %}
+                <div class="row">
+                    {% for subject in subjects %}
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">{{ subject.name }}</h5>
+                                <p class="card-text text-muted">{{ subject.code }}</p>
+                                <a href="{% url 'teachers:group_dashboard' subject.id %}" class="btn btn-primary">
+                                    <i class="fas fa-arrow-right"></i> Manage Class
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-book fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No subjects assigned</h5>
+                    <p class="text-muted">Contact your administrator to assign subjects to your account.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+        <a href="{% url 'teachers:dashboard' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% endblock %}
+
+

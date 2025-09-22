@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Announcement - SIH Smart Education{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-bullhorn"></i> Create New Announcement</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Announcement Title</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="content" class="form-label">Content</label>
+                        <textarea class="form-control" id="content" name="content" rows="8" required placeholder="Enter the announcement content here..."></textarea>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-bullhorn"></i> Create Announcement
+                        </button>
+                        <a href="{% url 'admin_dashboard' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6><i class="fas fa-info-circle"></i> Guidelines</h6>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li>Use clear and concise language</li>
+                    <li>Include important dates and deadlines</li>
+                    <li>Make sure the information is accurate and up-to-date</li>
+                    <li>Announcements will be visible to all users immediately</li>
+                    <li>You can edit or deactivate announcements later from the admin panel</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+

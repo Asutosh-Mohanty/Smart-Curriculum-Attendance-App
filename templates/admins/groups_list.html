@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Groups List - SIH Smart Education{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center">
+    <h3><i class="fas fa-layer-group"></i> Groups</h3>
+    <a class="btn btn-primary" href="{% url 'admins:group_create' %}">
+        <i class="fas fa-plus"></i> Create Group
+    </a>
+  </div>
+  <table class="table table-striped mt-3">
+    <thead><tr><th>Name</th><th>Branch</th><th>Degree</th><th style="width:160px;"></th></tr></thead>
+    <tbody>
+      {% for g in groups %}
+      <tr>
+        <td>{{ g.name }}</td>
+        <td>{{ g.branch.name }}</td>
+        <td>{{ g.degree.name }}</td>
+        <td>
+          <a class="btn btn-sm btn-outline-primary" href="{% url 'admins:group_edit' g.id %}">Edit</a>
+          <a class="btn btn-sm btn-outline-danger" href="{% url 'admins:group_delete' g.id %}">Delete</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4" class="text-muted">No groups</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

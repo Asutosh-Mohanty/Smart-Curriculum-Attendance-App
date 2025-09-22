@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Branch Form - SIH Smart Education{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-code-branch"></i> {% if branch %}Edit Branch{% else %}Create Branch{% endif %}</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Branch Name</label>
+                        <input type="text" class="form-control" id="name" name="name" 
+                               value="{% if branch %}{{ branch.name }}{% endif %}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="degree" class="form-label">Degree</label>
+                        <select class="form-select" id="degree" name="degree" required>
+                            <option value="">Choose a degree...</option>
+                            {% for d in degrees %}
+                            <option value="{{ d.id }}" {% if branch and branch.degree_id == d.id %}selected{% endif %}>{{ d.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> {% if branch %}Update{% else %}Create{% endif %} Branch
+                        </button>
+                        <a href="{% url 'admins:branches_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Branches
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
